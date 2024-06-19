@@ -13,45 +13,27 @@ steps:
       - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
 
   # Cloud run deployment
-  #- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  #  args:
-  #    - run
-  #    - deploy
-  #    - $_SERVICE_NAME
-  #    - '--image'
-  #    - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
-  #    - '--region'
-  #    - $_DEPLOY_REGION
-  #    - '--platform'
-  #    - $_PLATFORM
-  #    - '--port' 
-  #    - '5000'
-  #    - '--add-volume'
-  #    - 'name=sqlite-test,type=cloud-storage,bucket=book_indexes'
-  #    - '--add-volume-mount'
-  #    - 'volume=sqlite-test,mount-path=/app/data'
-  #    - '--execution-environment'
-  #    - 'gen2'
-  #  entrypoint: gcloud
-
-  - name: 'gcloud'  # Assuming gcloud is pre-installed
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     args:
       - beta
       - run
       - deploy
-      - $SERVICE_NAME  # Ensure this is a defined environment variable
+      - $_SERVICE_NAME
       - '--image'
-      - "$AR_HOSTNAME/$PROJECT_ID/$AR_REPO/$SERVICE_NAME:$COMMIT_SHA"
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
       - '--region'
-      - $DEPLOY_REGION  # Ensure this is a defined environment variable
+      - $_DEPLOY_REGION
       - '--platform'
-      - $PLATFORM  # Ensure this is a defined environment variable
-      - '--port'
-      - '8080'
-      - '--add-volume'  # Re-enable if volume mount is needed
-      - 'name=sqlite-book,type=cloud-storage,bucket=book_indexes'
-      - '--add-volume-mount'  # Re-enable if volume mount is needed
-      - 'volume=sqlite-book,mount-path=/app/data'
+      - $_PLATFORM
+      - '--port' 
+      - '5000'
+      - '--add-volume'
+      - 'name=sqlite-test,type=cloud-storage,bucket=book_indexes'
+      - '--add-volume-mount'
+      - 'volume=sqlite-test,mount-path=/app/data'
+      - '--execution-environment'
+      - 'gen2'
+    entrypoint: gcloud
     
 options:
   logging: CLOUD_LOGGING_ONLY
