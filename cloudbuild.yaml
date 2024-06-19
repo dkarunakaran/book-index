@@ -27,7 +27,6 @@ steps:
       - $_PLATFORM
       - '--port' 
       - '5000'
-      - '--allow-unauthenticated'
       - '--add-volume'
       - 'name=sqlite-test,type=cloud-storage,bucket=book_indexes'
       - '--add-volume-mount'
