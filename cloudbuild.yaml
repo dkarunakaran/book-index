@@ -1,0 +1,47 @@
+steps:
+  # Building the docker container
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+      - .
+  # Pushing docker container image to artifact registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+
+  # Cloud run deployment
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    args:
+      - run
+      - deploy
+      - $_SERVICE_NAME
+      - '--image'
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--region'
+      - $_DEPLOY_REGION
+      - '--platform'
+      - $_PLATFORM
+      - '--port' 
+      - '5000'
+      - '--add-volume'
+      - 'name=sqlite-test,type=cloud-storage,bucket=book_indexes'
+      - '--add-volume-mount'
+      - 'volume=sqlite-test,mount-path=/app/data'
+      - '--execution-environment'
+      - 'gen2'
+    entrypoint: gcloud
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  substitutionOption: ALLOW_LOOSE
+
+timeout: 1200s
+
+
+
+
+
+
