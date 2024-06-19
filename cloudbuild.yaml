@@ -37,6 +37,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     script: |
       #!/usr/bin/env bash
+      gcloud components update
       gcloud beta run deploy $SERVICE_NAME --image="$AR_HOSTNAME/$PROJECT_ID/$AR_REPO/$SERVICE_NAME:$COMMIT_SHA" --region=$DEPLOY_REGION --platform=$PLATFORM --port=8080 --add-volume="name=sqlite-book,type=cloud-storage,bucket=book_indexes" --add-volume-mount="volume=sqlite-book,mount-path=/app/data" --execution-environment=gen2
 
 options:
