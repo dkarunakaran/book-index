@@ -14,7 +14,6 @@ __source__ = ''
 app = Flask(__name__)
 
 # Reference code: https://www.wallacesharpedavidson.nz/post/sqlite-cloudrun
-
 # Create a SQLite database and table
 conn = sqlite3.connect('data/data.db')
 cursor = conn.cursor()
