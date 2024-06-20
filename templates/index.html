@@ -2,41 +2,25 @@
 
 {% block content %}
     <header>
-      <h1 class="title">Search</h1>
+      <h1 class="title">Search Index</h1>
     </header>
-    <div class="upload-container">
-      <h2 class="title" class="upload-label">Search Book Index</h2>
-      <form id="searchForm">
-        <input type="search" id="searchInput" placeholder="Enter your search term">
-        <button class="upload-button" type="submit">Search</button>
-      </form>
+
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword" aria-describedby="button-addon2">
+      <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
     </div>
 
-    <script>
-      const searchForm = document.getElementById('searchForm');
-      searchForm.addEventListener('submit', (event) => {
-        // Prevent default form submission behavior
-        event.preventDefault();
-    
-        // Get the search term from the input field
-        const searchTerm = document.getElementById('searchInput').value;
-    
-        // Implement your search logic here using the searchTerm
-        console.log("Search Term:", searchTerm);
-    
-        // Update search results or perform actions based on searchTerm
-      });
-    </script>
-
     <header>
-      <h1 class="title">Upload</h1>
+      <h1 class="title">Upload Book Index Image</h1>
     </header>
-    <div class="upload-container">
-      <h2 class="title" class="upload-label">Upload your book index image</h2>
-      <form action = "/uploader" method = "POST" 
-        enctype = "multipart/form-data">
-        <input id="image-upload" type = "file" name = "file" />
-        <input class="upload-button" type = "submit"/>
+    <div class="input-group mb-3">
+      <form class="row g-2" action = "/uploader" method = "POST" enctype = "multipart/form-data">
+        <div class="col-auto">
+          <input class="form-control" id="image-upload" type = "file" name = "file" />
+        </div>
+        <div class="col-auto">
+          <input class="btn btn-outline-secondary" type = "submit"/>
+        </div>
       </form>
     </div>
 

@@ -106,6 +106,24 @@ def upload_file():
       # remove the processed image
       os.remove(ofilename)
 
+      file = open('extracted_text.txt', 'w')
+      file.write(text)
+      file.close()
+
+      # Using readlines()
+      file1 = open('extracted_text.txt', 'r')
+      Lines = file1.readlines()
+      count = 0
+
+      # Strips the newline character
+      for line in Lines:
+        if line.strip() != "":
+            count += 1
+            data = line.strip().split(",")
+            print("Line{}: {}".format(count, data))
+
+      os.remove('extracted_text.txt')
+
       return render_template("uploaded.html", displaytext=text, fname=filename)
 
 if __name__ == '__main__':
