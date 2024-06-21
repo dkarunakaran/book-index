@@ -20,33 +20,29 @@
     </div>
   </nav>
 
-    <header>
-      <h1 class="title">Search Index</h1>
-    </header>
-
-    <header>
-      <h1 class="title">List of items</h1>
-    </header>
-    <div class="input-group mb-3">
-      <table class="table">
-        <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Keyword</th>
-              <th scope="col">Page</th>
-            </tr>
-        </thead>
-        <tbody>
-          {%for id, keyword, page, book_id in indexes%}
+  <header>
+    <h1 class="title">List of items</h1>
+  </header>
+  <div class="input-group mb-3">
+    <table class="table">
+      <thead>
           <tr>
-            <td> {{id}} </td>
-            <td> {{keyword.capitalize()}} </td>
-            <td> {{page}} </td>
+            <th scope="col">#</th>
+            <th scope="col">Keyword</th>
+            <th scope="col">Page</th>
           </tr>
-            {%endfor%}
-        </tbody>
-        </table>
-    </div>
+      </thead>
+      <tbody>
+        {%for id, keyword, page, book_id in indexes%}
+        <tr>
+          <td> {{id}} </td>
+          <td> {{keyword.capitalize()}} </td>
+          <td> {{page}} </td>
+        </tr>
+          {%endfor%}
+      </tbody>
+      </table>
+  </div>
 
   
 
