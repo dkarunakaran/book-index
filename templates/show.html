@@ -7,13 +7,13 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="/">Search <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/upload">Upload</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item active">
           <a class="nav-link" href="/show">Show</a>
         </li>
       </ul>
@@ -24,33 +24,24 @@
       <h1 class="title">Search Index</h1>
     </header>
 
-    <div class="input-group mb-3">
-      <form class="row g-2" action = "/search" method = "POST" enctype = "multipart/form-data">
-        <div class="col-auto">
-          <input type="text" class="form-control" placeholder="Keyword" name="keyword" aria-label="Keyword" aria-describedby="button-addon2">
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
-        </div>
-      </form>
-    </div>
-
     <header>
-      <h1 class="title">List of Books</h1>
+      <h1 class="title">List of items</h1>
     </header>
     <div class="input-group mb-3">
       <table class="table">
         <thead>
             <tr>
-            <th scope="col">#</th>
-            <th scope="col">Book</th>
+              <th scope="col">#</th>
+              <th scope="col">Keyword</th>
+              <th scope="col">Page</th>
             </tr>
         </thead>
         <tbody>
-          {%for id, title in books%}
+          {%for id, keyword, page, book_id in indexes%}
           <tr>
             <td> {{id}} </td>
-            <td> {{title.capitalize()}} </td>
+            <td> {{keyword.capitalize()}} </td>
+            <td> {{page}} </td>
           </tr>
             {%endfor%}
         </tbody>
