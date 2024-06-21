@@ -80,9 +80,6 @@ def search():
      conn.close()
      return render_template("search.html", books=books)
 
-@app.route("/about")
-def about():
-  return render_template("about.html")
 
 def contains_any_letter_regex(data):
   """Checks if the data string contains any letters (a-z or A-Z) using regex.
