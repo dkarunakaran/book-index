@@ -168,19 +168,21 @@ def upload_file():
       # Strips the newline character
       for line in Lines:
         if line.strip() != "":
-            index_name = None
+            index_name = []
             index_page = []
             count += 1
             data = line.strip().split(",")
             for item in data:
                item = item.strip()
-               if contains_any_letter_regex(item) and index_name is None:
-                  index_name = item.strip()
+               if contains_any_letter_regex(item):
+                  index_name.append(item.strip())
                elif contains_any_letter_regex(item) is False:
                   index_page.append(item)
-            for page in index_page:
-               if index_name != None:
-                  cursor.execute("""INSERT INTO Indexes (keyword, page, book_id) VALUES (?, ?, ?)""", [index_name.lower(), page, book_id])
+            if len(index_name) > 0:
+              separator = ' ' 
+              index_name_joined = separator.join(index_name)
+              for page in index_page: 
+                  cursor.execute("""INSERT INTO Indexes (keyword, page, book_id) VALUES (?, ?, ?)""", [index_name_joined.lower(), page, book_id])
                   conn.commit()     
             #print("Line{}: {}".format(count, data))
 
