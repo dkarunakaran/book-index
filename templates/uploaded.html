@@ -1,25 +1,60 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<p class="text-left">{{ fname }} successfully uploaded.</p>
+<header>
+    <h1 class="title">Upload image again?</h1>
+</header>
+<div class="input-group mb-3">
+    <form class="row g-2" action = "/uploader" method = "POST" enctype = "multipart/form-data">
+        <div class="col-auto">
+            <input class="btn btn-outline-secondary" placeholder="Book name" value="{{ bname }}" type = "text" name="book"/>
+        </div>
+        <div class="col-auto">
+        <input class="form-control" id="image-upload" type = "file" name = "file" />
+        </div>
+        <div class="col-auto">
+        <input class="btn btn-outline-secondary" type = "submit"/>
+        </div>
+    </form>
+</div>
+<br/>
+<hr/>
+<br/>
+<header>
+    <h1 class="title">{{ fname }} successfully uploaded.</h1>
+</header>
+<br/>
 <div class="row">
     <div class="col-md-5">
         <div class="image-container">
             <p class="text-left">Original Image</p>     
-            <a href="/static/uploads/{{ fname }}" target="_new"><img src="/static/uploads/{{ fname }}" class="upload-image-thumb"></a>
+            <a href="/static/uploads/{{ fname }}" target="_new"><img src="/static/uploads/{{ fname }}" class="upload-image-thumb" width="200"></a>
         </div>
-        <div class="upload-form">
-            <p class="text-left">Upload another?</p>
-            <form action = "/uploader" method = "POST" 
-                              enctype = "multipart/form-data">
-                <input type = "file" name = "file" />
-                <input type = "submit"/>
-            </form>
-        </div>        
     </div>
     <div class="col-md-7 ocr-text">
         <p class="text-left">OCR Text from processed Image</p>
-        <textarea cols="80" rows="60">{{ displaytext }}</textarea>
+        <textarea cols="50" rows="10">{{ displaytext }}</textarea>
     </div>
 </div>  
+<header>
+    <h1 class="title">List of Books</h1>
+</header>
+<div class="input-group mb-3">
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Book</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for id, title in books%}
+        <tr>
+        <td> {{id}} </td>
+        <td> {{title}} </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    </table>
+</div>
 {% endblock %}

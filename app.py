@@ -7,22 +7,33 @@ import pytesseract
 import argparse
 import cv2
 import sqlite3
+import re
 
 __author__ = ''
 __source__ = ''
 
 app = Flask(__name__)
 
-
+# Reference code: https://www.wallacesharpedavidson.nz/post/sqlite-cloudrun
 # Create a SQLite database and table
 conn = sqlite3.connect('data/data.db')
 cursor = conn.cursor()
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS book_index (
+    CREATE TABLE IF NOT EXISTS Book (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        page INTEGER,
-        book TEXT
+        title TEXT
+    )
+''')
+conn.commit()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Indexes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        keyword TEXT,
+        page TEXT,
+        book_id INTEGER,
+        CONSTRAINT fk_book  
+        FOREIGN KEY (book_id) 
+        REFERENCES Book(book_id) 
     )
 ''')
 conn.commit()
@@ -37,47 +48,59 @@ app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 def get_users():
     conn = sqlite3.connect('data/data.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM book_index')
+    cursor.execute('SELECT * FROM Indexes')
     indexes = cursor.fetchall()
     conn.close()
     return jsonify({'indexes': indexes})
 
-# Endpoint to add a user
-@app.route('/add')
-def add_user():
-    try:
-        # Get user data from the request
-        title = "dhanoop"
-        page = "37"
-
-        # Validate user input
-        if not title or not page:
-            return jsonify({'error': 'Name and age are required'}), 400
-
-        # Insert user into the database
-        conn = sqlite3.connect('data/data.db')
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO book_index (title, page) VALUES (?, ?)', (title, page))
-        conn.commit()
-        conn.close()
-
-        return jsonify({'message': 'User added successfully'}), 201
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @app.route("/")
 def index():
-  return render_template("index.html")
+  conn = sqlite3.connect('data/data.db')
+  cursor = conn.cursor()
+  cursor.execute('SELECT id, title FROM Book') 
+  books = cursor.fetchall()
+  conn.close()
+  return render_template("index.html", books=books)
 
-@app.route("/about")
-def about():
-  return render_template("about.html")
+@app.route("/search", methods = ['GET', 'POST'])
+def search():
+  conn = sqlite3.connect('data/data.db')
+  cursor = conn.cursor()
+  cursor.execute('SELECT id, title FROM Book') 
+  books = cursor.fetchall()
+
+  if request.method == 'POST' and request.form['keyword'] != "" :
+      keyword = request.form['keyword'].strip().lower()
+      query = f"SELECT i.page, b.title FROM Indexes i INNER JOIN Book b ON i.book_id=b.id WHERE i.keyword LIKE '%{keyword}%'"
+      cursor.execute(query)
+      results = cursor.fetchall()
+      conn.close()
+      return render_template("search.html", books=books, indexes=results)
+  else:
+     conn.close()
+     return render_template("search.html", books=books)
+
+
+def contains_any_letter_regex(data):
+  """Checks if the data string contains any letters (a-z or A-Z) using regex.
+
+  Args:
+    data: The string to check.
+
+  Returns:
+    True if the data contains at least one letter, False otherwise.
+  """
+
+  pattern = r"[a-zA-Z]+"  # Matches one or more letters
+  return bool(re.search(pattern, data))
 
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
-   if request.method == 'POST':
+   if request.form['book'] != "" and request.method == 'POST':
+      
       f = request.files['file']
+
+      book = request.form['book'].lower()
 
       # create a secure filename
       filename = secure_filename(f.filename)
@@ -106,7 +129,66 @@ def upload_file():
       # remove the processed image
       os.remove(ofilename)
 
-      return render_template("uploaded.html", displaytext=text, fname=filename)
+      file = open('extracted_text.txt', 'w')
+      file.write(text)
+      file.close()
+
+      conn = sqlite3.connect('data/data.db')
+      cursor = conn.cursor()
+      query = f"SELECT id FROM Book where title LIKE '{book}%' LIMIT 1"
+      cursor.execute(query)
+      book_id = cursor.fetchall()
+    
+      if len(book_id) == 0:
+        cursor.execute("""INSERT INTO Book (title) VALUES (?)""", [book])
+        conn.commit()
+        query = f"SELECT id FROM Book where title LIKE '{book}%' LIMIT 1"
+        cursor.execute(query)
+        book_id = cursor.fetchall()
+        book_id = book_id[0][0]
+      else:
+        book_id = book_id[0][0]
+
+    
+      # Using readlines()
+      file1 = open('extracted_text.txt', 'r')
+      Lines = file1.readlines()
+      count = 0
+
+      # Strips the newline character
+      for line in Lines:
+        if line.strip() != "":
+            index_name = None
+            index_page = []
+            count += 1
+            data = line.strip().split(",")
+            for item in data:
+               item = item.strip()
+               if contains_any_letter_regex(item) and index_name is None:
+                  index_name = item.strip()
+               elif contains_any_letter_regex(item) is False:
+                  index_page.append(item)
+            for page in index_page:
+               if index_name != None:
+                  cursor.execute("""INSERT INTO Indexes (keyword, page, book_id) VALUES (?, ?, ?)""", [index_name.lower(), page, book_id])
+                  conn.commit()     
+            #print("Line{}: {}".format(count, data))
+
+      os.remove('extracted_text.txt')
+
+      conn = sqlite3.connect('data/data.db')
+      cursor = conn.cursor()
+      cursor.execute('SELECT id, title FROM Book') 
+      books = cursor.fetchall()
+
+      conn.close() 
+
+
+      return render_template("uploaded.html", displaytext=text, fname=filename, bname=book, books=books)
+   
+   else:
+      return render_template("error.html")
+      
 
 if __name__ == '__main__':
   port = int(os.environ.get('PORT', 5000))
