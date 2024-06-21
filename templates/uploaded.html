@@ -7,6 +7,9 @@
 <div class="input-group mb-3">
     <form class="row g-2" action = "/uploader" method = "POST" enctype = "multipart/form-data">
         <div class="col-auto">
+            <input class="btn btn-outline-secondary" placeholder="Book name" value="{{ bname }}" type = "text" name="book"/>
+        </div>
+        <div class="col-auto">
         <input class="form-control" id="image-upload" type = "file" name = "file" />
         </div>
         <div class="col-auto">
@@ -33,4 +36,25 @@
         <textarea cols="50" rows="10">{{ displaytext }}</textarea>
     </div>
 </div>  
+<header>
+    <h1 class="title">List of Books</h1>
+</header>
+<div class="input-group mb-3">
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Book</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for id, title in books%}
+        <tr>
+        <td> {{id}} </td>
+        <td> {{title}} </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    </table>
+</div>
 {% endblock %}

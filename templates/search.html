@@ -17,20 +17,25 @@
     </div>
 
     <header>
-      <h1 class="title">Upload Book Index Image</h1>
+      <h1 class="title">Search Result</h1>
     </header>
     <div class="input-group mb-3">
-      <form class="row g-2" action = "/uploader" method = "POST" enctype = "multipart/form-data">
-        <div class="col-auto">
-          <input class="btn btn-outline-secondary" placeholder="Book name" type = "text" name="book"/>
-        </div>
-        <div class="col-auto">
-          <input class="form-control" id="image-upload" type = "file" name = "file" />
-        </div>
-        <div class="col-auto">
-          <input class="btn btn-outline-secondary" type = "submit"/>
-        </div>
-      </form>
+      <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Book</th>
+            <th scope="col">Page no.</th>
+            </tr>
+        </thead>
+        <tbody>
+          {%for page, title in indexes%}
+          <tr>
+            <td> {{title.capitalize()}} </td>
+            <td> {{page}} </td>
+          </tr>
+            {%endfor%}
+        </tbody>
+        </table>
     </div>
 
     <header>
