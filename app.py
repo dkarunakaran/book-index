@@ -51,7 +51,8 @@ def get_users():
     cursor.execute('SELECT * FROM Indexes')
     indexes = cursor.fetchall()
     conn.close()
-    return jsonify({'indexes': indexes})
+    return render_template("show.html", indexes=indexes)
+
 
 @app.route("/")
 def index():
@@ -61,6 +62,15 @@ def index():
   books = cursor.fetchall()
   conn.close()
   return render_template("index.html", books=books)
+
+@app.route("/upload")
+def upload():
+  conn = sqlite3.connect('data/data.db')
+  cursor = conn.cursor()
+  cursor.execute('SELECT id, title FROM Book') 
+  books = cursor.fetchall()
+  conn.close()
+  return render_template("upload.html", books=books)
 
 @app.route("/search", methods = ['GET', 'POST'])
 def search():
