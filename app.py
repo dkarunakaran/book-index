@@ -21,7 +21,8 @@ cursor = conn.cursor()
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Book (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT
+        title TEXT,
+        author TEXT
     )
 ''')
 conn.commit()
@@ -58,7 +59,7 @@ def get_users():
 def index():
   conn = sqlite3.connect('data/data.db')
   cursor = conn.cursor()
-  cursor.execute('SELECT id, title FROM Book') 
+  cursor.execute('SELECT id, title, author FROM Book') 
   books = cursor.fetchall()
   conn.close()
   return render_template("index.html", books=books)
@@ -67,7 +68,7 @@ def index():
 def upload():
   conn = sqlite3.connect('data/data.db')
   cursor = conn.cursor()
-  cursor.execute('SELECT id, title FROM Book') 
+  cursor.execute('SELECT id, title, author FROM Book') 
   books = cursor.fetchall()
   conn.close()
   return render_template("upload.html", books=books)
@@ -76,7 +77,7 @@ def upload():
 def search():
   conn = sqlite3.connect('data/data.db')
   cursor = conn.cursor()
-  cursor.execute('SELECT id, title FROM Book') 
+  cursor.execute('SELECT id, title, author FROM Book') 
   books = cursor.fetchall()
 
   if request.method == 'POST' and request.form['keyword'] != "" :
@@ -190,7 +191,7 @@ def upload_file():
 
       conn = sqlite3.connect('data/data.db')
       cursor = conn.cursor()
-      cursor.execute('SELECT id, title FROM Book') 
+      cursor.execute('SELECT id, title, author FROM Book') 
       books = cursor.fetchall()
 
       conn.close() 

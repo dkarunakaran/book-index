@@ -65,13 +65,14 @@
             <tr>
             <th scope="col">#</th>
             <th scope="col">Book</th>
-            </tr>
+            <th scope="col">Author</th>
         </thead>
         <tbody>
-          {%for id, title in books%}
+          {%for id, title, author in books%}
           <tr>
             <td> {{id}} </td>
             <td> {{title.capitalize()}} </td>
+            <td> {{author}} </td>
           </tr>
             {%endfor%}
         </tbody>
