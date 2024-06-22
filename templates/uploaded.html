@@ -66,13 +66,14 @@
         </tr>
     </thead>
     <tbody>
-        {%for id, title in books%}
+        {%for id, title, author in books%}
         <tr>
         <td> {{id}} </td>
-        <td> {{title}} </td>
+        <td> {{title.capitalize()}} </td>
+        <td> {{author}} </td>
         </tr>
         {%endfor%}
-    </tbody>
+</tbody>
     </table>
 </div>
 {% endblock %}
