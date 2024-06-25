@@ -15,6 +15,7 @@ RUN apt update \
 RUN pip3 install pytesseract
 RUN pip3 install opencv-python
 RUN pip3 install pillow
+RUN pip3 install pandas
 
 COPY . /app
 WORKDIR /app

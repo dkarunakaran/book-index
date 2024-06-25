@@ -8,6 +8,8 @@ import argparse
 import cv2
 import sqlite3
 import re
+import pandas as pd
+from collections import defaultdict
 
 __author__ = ''
 __source__ = ''
@@ -45,14 +47,26 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 
 # Endpoint to get all users
-@app.route('/show', methods=['GET'])
-def get_users():
+@app.route('/show/<page_id>', methods=['GET'])
+def get_show_page(page_id):
     conn = sqlite3.connect('data/data.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Indexes')
-    indexes = cursor.fetchall()
+    cursor.execute(f"select keyword, page FROM Indexes WHERE book_id={page_id} order by keyword ASC")
+    result = cursor.fetchall()
+    cursor.execute(f"SELECT id, title, author FROM Book where id={page_id}") 
+    book = cursor.fetchall()
     conn.close()
-    return render_template("show.html", indexes=indexes)
+    return render_template("show_page.html", book=book, result=result)
+
+# Endpoint to get all books' indexes
+@app.route('/show', methods=['GET'])
+def get_show():
+    conn = sqlite3.connect('data/data.db')
+    cursor = conn.cursor()
+    cursor.execute("select b.id as 'Book ID', b.title as 'Title', count(i.id) as 'Total Indexes' from Indexes i INNER join Book b on i.book_id=b.id GROUP by b.title order by b.title ASC")
+    result = cursor.fetchall()
+    conn.close()
+    return render_template("show.html", result=result)
 
 
 @app.route("/")
@@ -79,17 +93,23 @@ def search():
   cursor = conn.cursor()
   cursor.execute('SELECT id, title, author FROM Book') 
   books = cursor.fetchall()
-
+  # Defining a dict
+  d = defaultdict(list)
   if request.method == 'POST' and request.form['keyword'] != "" :
       keyword = request.form['keyword'].strip().lower()
-      query = f"SELECT i.page, b.title FROM Indexes i INNER JOIN Book b ON i.book_id=b.id WHERE i.keyword LIKE '%{keyword}%'"
+      query = f"SELECT b.id, i.page, b.title FROM Indexes i INNER JOIN Book b ON i.book_id=b.id WHERE i.keyword LIKE '%{keyword}%' ORDER BY b.title ASC, i.page"
       cursor.execute(query)
       results = cursor.fetchall()
       conn.close()
-      return render_template("search.html", books=books, indexes=results)
+      for _, page, title in results:
+         if page is "" or page in d[title]:
+            continue
+         d[title].append(page)
+
+      return render_template("search.html", books=books, results=d)
   else:
      conn.close()
-     return render_template("search.html", books=books)
+     return render_template("search.html", books=books, results=d)
 
 
 def contains_any_letter_regex(data):
@@ -112,6 +132,7 @@ def upload_file():
       f = request.files['file']
 
       book = request.form['book'].lower()
+      author = request.form['author']
 
       # create a secure filename
       filename = secure_filename(f.filename)
@@ -151,7 +172,7 @@ def upload_file():
       book_id = cursor.fetchall()
     
       if len(book_id) == 0:
-        cursor.execute("""INSERT INTO Book (title) VALUES (?)""", [book])
+        cursor.execute("""INSERT INTO Book (title, author) VALUES (?,?)""", [book, author])
         conn.commit()
         query = f"SELECT id FROM Book where title LIKE '{book}%' LIMIT 1"
         cursor.execute(query)
@@ -197,7 +218,7 @@ def upload_file():
       conn.close() 
 
 
-      return render_template("uploaded.html", displaytext=text, fname=filename, bname=book, books=books)
+      return render_template("uploaded.html", displaytext=text, fname=filename, bname=book, books=books, aname=author)
    
    else:
       return render_template("error.html")

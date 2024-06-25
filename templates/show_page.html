@@ -21,21 +21,21 @@
   </nav>
 
   <header>
-    <h1 class="title">List of Books</h1>
+    <h1 class="title">{{book[0][1]}} by {{book[0][2]}}</h1>
   </header>
   <div class="input-group mb-3">
     <table class="table">
       <thead>
           <tr>
-            <th scope="col">Title</th>
-            <th scope="col">No. of indexes</th>
+            <th scope="col">Keyword</th>
+            <th scope="col">Page</th>
           </tr>
       </thead>
       <tbody>
-        {%for id, title, count in result%}
+        {%for keyword, page in result%}
         <tr>
-          <td> <a href="show/{{id}}">{{title.capitalize()}} </a></td>
-          <td> {{count}} </td>
+          <td> {{keyword.capitalize()}} </td>
+          <td> {{page}} </td>
         </tr>
           {%endfor%}
       </tbody>

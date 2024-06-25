@@ -46,12 +46,12 @@
             </tr>
         </thead>
         <tbody>
-          {%for page, title in indexes%}
+          {%for k,v in results.items()%}
           <tr>
-            <td> {{title.capitalize()}} </td>
-            <td> {{page}} </td>
+            <td> {{k.capitalize()}} </td>
+            <td> {{", ".join(v)}} </td>
           </tr>
-            {%endfor%}
+          {%endfor%}
         </tbody>
         </table>
     </div>
